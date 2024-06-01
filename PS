@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Directory to monitor
-DIR_TO_MONITOR="/path/to/your/directory"
+DIR_TO_MONITOR="/home/isaac/Downloads"
 # Baseline file to store the hash values
-BASELINE_FILE="baseline_hashes.txt"
+BASELINE_FILE="/home/isaac/Downloads/baseline_hashes.txt"
 # Interval between checks (in seconds)
 CHECK_INTERVAL=60
 
 # Function to generate hash values for files
 generate_hashes() {
-    find "$DIR_TO_MONITOR" -type f -exec sha256sum {} \; | sort > "$1"
+    find "$DIR_TO_MONITOR" -type f -name "*.pdf" -exec sha256sum {} \; | sort > "$1"
 }
 
 # Create the baseline if it doesn't exist

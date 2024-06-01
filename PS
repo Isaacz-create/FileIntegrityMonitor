@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Directory to monitor
+DIR_TO_MONITOR="/path/to/your/directory"
+# Baseline file to store the hash values
+BASELINE_FILE="baseline_hashes.txt"
+# Interval between checks (in seconds)
+CHECK_INTERVAL=60
+
+# Function to generate hash values for files
+generate_hashes() {
+    find "$DIR_TO_MONITOR" -type f -exec sha256sum {} \; | sort > "$1"
+}
+
+# Create the baseline if it doesn't exist
+if [ ! -f "$BASELINE_FILE" ]; then
+    echo "Creating baseline hashes..."
+    generate_hashes "$BASELINE_FILE"
+    echo "Baseline created."
+else
+    echo "Using existing baseline."
+fi
+
+# Periodically check for changes
+while true; do
+    echo "Checking for changes..."
+    TEMP_FILE=$(mktemp)
+    generate_hashes "$TEMP_FILE"
+    CHANGES=$(diff "$BASELINE_FILE" "$TEMP_FILE")
+    
+    if [ -n "$CHANGES" ]; then
+        echo "Changes detected:"
+        echo "$CHANGES"
+    else
+        echo "No changes detected."
+    fi
+    
+    rm "$TEMP_FILE"
+    sleep "$CHECK_INTERVAL"
+done
